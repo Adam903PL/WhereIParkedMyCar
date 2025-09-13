@@ -1,33 +1,23 @@
 // components/ui/Alert.tsx
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import {
+  Dimensions,
   Modal,
   StyleSheet,
   Text,
-  TextStyle,
   TouchableOpacity,
   View,
   ViewStyle,
 } from 'react-native';
 import Animated, {
-  Easing,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
-  withTiming,
+  withTiming
 } from 'react-native-reanimated';
-import { t } from '../../../i18n';
-import {
-  ALERT_VARIANTS,
-  ANIMATIONS,
-  BORDER_RADIUS,
-  COLORS,
-  SHADOWS,
-  SPACING,
-  TYPOGRAPHY,
-} from '../../../theme/designTokens';
+
+const { width } = Dimensions.get('window');
 
 type AlertVariant = 'success' | 'error' | 'warning' | 'info';
 
@@ -37,11 +27,11 @@ interface AlertProps {
   message: string;
   variant?: AlertVariant;
   onClose: () => void;
-  customActions?: Array<{
+  customActions?: {
     title: string;
     onPress: () => void;
     variant?: 'primary' | 'ghost';
-  }>;
+  }[];
   style?: ViewStyle;
 }
 
@@ -54,115 +44,156 @@ const Alert: React.FC<AlertProps> = ({
   customActions,
   style,
 }) => {
-  const alertScale = useSharedValue(0);
-  const alertOpacity = useSharedValue(0);
-  const backdropOpacity = useSharedValue(0);
+  const scale = useSharedValue(0);
+  const opacity = useSharedValue(0);
+  const translateY = useSharedValue(50);
 
   React.useEffect(() => {
     if (visible) {
-      backdropOpacity.value = withTiming(1, {
-        duration: ANIMATIONS.timing.normal,
-        easing: Easing.out(Easing.quad),
+      opacity.value = withTiming(1, { duration: 200 });
+      scale.value = withSpring(1, {
+        damping: 20,
+        stiffness: 300,
       });
-      alertScale.value = withSpring(1, ANIMATIONS.spring.bouncy);
-      alertOpacity.value = withTiming(1, {
-        duration: ANIMATIONS.timing.normal,
-        easing: Easing.out(Easing.quad),
+      translateY.value = withSpring(0, {
+        damping: 20,
+        stiffness: 300,
       });
     } else {
-      backdropOpacity.value = withTiming(0, {
-        duration: ANIMATIONS.timing.fast,
-      });
-      alertScale.value = withSpring(0, ANIMATIONS.spring.gentle);
-      alertOpacity.value = withTiming(0, {
-        duration: ANIMATIONS.timing.fast,
-      });
+      opacity.value = withTiming(0, { duration: 150 });
+      scale.value = withTiming(0.9, { duration: 150 });
+      translateY.value = withTiming(20, { duration: 150 });
     }
   }, [visible]);
 
-  const alertAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: alertScale.value }],
-    opacity: alertOpacity.value,
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+    transform: [
+      { scale: scale.value },
+      { translateY: translateY.value },
+    ],
   }));
 
-  const backdropAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: backdropOpacity.value,
+  const backdropStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
   }));
 
   if (!visible) return null;
 
-  const variantConfig = ALERT_VARIANTS[variant];
+  const getVariantConfig = () => {
+    switch (variant) {
+      case 'success':
+        return {
+          icon: 'checkmark-circle',
+          iconColor: '#10B981',
+          backgroundColor: '#F0FDF4',
+          borderColor: '#BBF7D0',
+        };
+      case 'error':
+        return {
+          icon: 'close-circle',
+          iconColor: '#EF4444',
+          backgroundColor: '#FEF2F2',
+          borderColor: '#FECACA',
+        };
+      case 'warning':
+        return {
+          icon: 'warning',
+          iconColor: '#F59E0B',
+          backgroundColor: '#FFFBEB',
+          borderColor: '#FDE68A',
+        };
+      case 'info':
+      default:
+        return {
+          icon: 'information-circle',
+          iconColor: '#3B82F6',
+          backgroundColor: '#EFF6FF',
+          borderColor: '#BFDBFE',
+        };
+    }
+  };
+
+  const config = getVariantConfig();
 
   return (
-    <Modal transparent visible={visible} animationType="none" statusBarTranslucent>
+    <Modal
+      transparent
+      visible={visible}
+      animationType="none"
+      statusBarTranslucent
+      onRequestClose={onClose}
+    >
       <View style={styles.overlay}>
-        <Animated.View style={[styles.backdrop, backdropAnimatedStyle]} />
+        <Animated.View style={[styles.backdrop, backdropStyle]} />
         <TouchableOpacity
           style={styles.backdropTouchable}
           activeOpacity={1}
           onPress={onClose}
         />
         
-        <Animated.View style={[styles.alert, alertAnimatedStyle, style]}>
-          <LinearGradient
-            colors={variantConfig.colors as [string, string]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.alertGradient}
-          >
-            <View style={styles.content}>
-              {/* Icon */}
+        <Animated.View style={[animatedStyle]}>
+          <View style={[
+            styles.alert,
+            {
+              backgroundColor: config.backgroundColor,
+              borderColor: config.borderColor,
+            },
+            style
+          ]}>
+            {/* Header with icon and close button */}
+            <View style={styles.header}>
               <View style={styles.iconContainer}>
                 <Ionicons
-                  name={variantConfig.icon as keyof typeof Ionicons.glyphMap}
-                  size={48}
-                  color={COLORS.text.primary}
+                  name={config.icon as keyof typeof Ionicons.glyphMap}
+                  size={24}
+                  color={config.iconColor}
                 />
               </View>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={onClose}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              >
+                <Ionicons name="close" size={20} color="#6B7280" />
+              </TouchableOpacity>
+            </View>
 
-              {/* Title */}
+            {/* Content */}
+            <View style={styles.content}>
               <Text style={styles.title}>{title}</Text>
-
-              {/* Message */}
               <Text style={styles.message}>{message}</Text>
+            </View>
 
-              {/* Actions */}
+            {/* Actions */}
+            {(customActions || []).length > 0 ? (
               <View style={styles.actions}>
-                {customActions ? (
-                  customActions.map((action, index) => (
-                    <TouchableOpacity
-                      key={index}
-                      style={[
-                        styles.actionButton,
-                        action.variant === 'ghost' && styles.ghostButton,
-                      ]}
-                      onPress={action.onPress}
-                      activeOpacity={0.8}
-                    >
-                      <Text
-                        style={[
-                          styles.actionButtonText,
-                          action.variant === 'ghost' && styles.ghostButtonText,
-                        ]}
-                      >
-                        {action.title}
-                      </Text>
-                    </TouchableOpacity>
-                  ))
-                ) : (
+                {customActions?.map((action, index) => (
                   <TouchableOpacity
-                    style={styles.actionButton}
-                    onPress={onClose}
-                    activeOpacity={0.8}
+                    key={index}
+                    style={[
+                      styles.actionButton,
+                      action.variant === 'ghost' 
+                        ? styles.ghostButton 
+                        : [styles.primaryButton, { backgroundColor: config.iconColor }]
+                    ]}
+                    onPress={action.onPress}
                   >
-                    <Text style={styles.actionButtonText}>
-                      {t('common.ok')}
+                    <Text
+                      style={[
+                        styles.actionButtonText,
+                        action.variant === 'ghost' 
+                          ? [styles.ghostButtonText, { color: config.iconColor }]
+                          : styles.primaryButtonText
+                      ]}
+                    >
+                      {action.title}
                     </Text>
                   </TouchableOpacity>
-                )}
+                ))}
               </View>
-            </View>
-          </LinearGradient>
+            ) : null}
+          </View>
         </Animated.View>
       </View>
     </Modal>
@@ -174,7 +205,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: SPACING.xl,
+    paddingHorizontal: 20,
   },
   backdrop: {
     position: 'absolute',
@@ -182,7 +213,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: COLORS.background.overlay,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   backdropTouchable: {
     position: 'absolute',
@@ -192,71 +223,98 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
   alert: {
-    borderRadius: BORDER_RADIUS.xxl,
-    overflow: 'hidden',
-    ...SHADOWS.xl,
-    maxWidth: 400,
-    width: '100%',
+    width: Math.min(width - 40, 400),
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: 0,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 10,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 20,
+    elevation: 10,
   },
-  alertGradient: {
-    paddingHorizontal: SPACING.xl,
-    paddingVertical: SPACING.xxxl,
-  },
-  content: {
+  header: {
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingTop: 20,
+    paddingHorizontal: 20,
+    paddingBottom: 16,
   },
   iconContainer: {
-    marginBottom: SPACING.lg,
-    padding: SPACING.md,
-    borderRadius: BORDER_RADIUS.full,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  closeButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(107, 114, 128, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  content: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
   },
   title: {
-    color: COLORS.text.primary,
-    fontSize: TYPOGRAPHY.fontSizes['2xl'],
-    fontWeight: TYPOGRAPHY.fontWeights.extrabold as any,
-    marginBottom: SPACING.sm,
-    textAlign: 'center',
-    textShadowColor: 'rgba(0, 0, 0, 0.3)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
-  } as TextStyle,
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#111827',
+    marginBottom: 8,
+    lineHeight: 24,
+  },
   message: {
-    color: COLORS.text.secondary,
-    fontSize: TYPOGRAPHY.fontSizes.base,
-    textAlign: 'center',
-    lineHeight: TYPOGRAPHY.fontSizes.base * TYPOGRAPHY.lineHeights.normal,
-    marginBottom: SPACING.xl,
-    fontWeight: TYPOGRAPHY.fontWeights.medium as any,
-  } as TextStyle,
+    fontSize: 15,
+    color: '#6B7280',
+    lineHeight: 22,
+  },
   actions: {
     flexDirection: 'row',
-    gap: SPACING.md,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+    gap: 12,
     flexWrap: 'wrap',
-    justifyContent: 'center',
   },
   actionButton: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    paddingHorizontal: SPACING.xl,
-    paddingVertical: SPACING.md,
-    borderRadius: BORDER_RADIUS.xl,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
+    height: 44,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 16,
     minWidth: 100,
-    ...SHADOWS.small,
+  },
+  primaryButton: {
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   ghostButton: {
     backgroundColor: 'transparent',
-    borderColor: 'rgba(255, 255, 255, 0.5)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(107, 114, 128, 0.2)',
   },
   actionButtonText: {
-    color: COLORS.text.primary,
-    fontSize: TYPOGRAPHY.fontSizes.base,
-    fontWeight: TYPOGRAPHY.fontWeights.bold as any,
-    textAlign: 'center',
-  } as TextStyle,
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  primaryButtonText: {
+    color: '#FFFFFF',
+  },
   ghostButtonText: {
-    opacity: 0.9,
+    // color will be set dynamically based on variant
   },
 });
 

@@ -98,6 +98,9 @@ class CustomI18nManager {
 
   async setLanguage(language: SupportedLanguage): Promise<void> {
     try {
+      // Wait for initialization to complete
+      await this.waitForInitialization();
+      
       this.currentLanguage = language;
       await AsyncStorage.setItem(LANGUAGE_STORAGE_KEY, language);
       

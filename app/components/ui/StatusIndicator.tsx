@@ -4,18 +4,18 @@ import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { StyleSheet, Text, View, ViewStyle } from 'react-native';
 import Animated, {
-    useAnimatedStyle,
-    useSharedValue,
-    withRepeat,
-    withSequence,
-    withTiming,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withSequence,
+  withTiming,
 } from 'react-native-reanimated';
 import {
-    BORDER_RADIUS,
-    COLORS,
-    SHADOWS,
-    SPACING,
-    TYPOGRAPHY,
+  BORDER_RADIUS,
+  COLORS,
+  SHADOWS,
+  SPACING,
+  TYPOGRAPHY,
 } from '../../../theme/designTokens';
 
 type StatusVariant = 'active' | 'inactive' | 'loading' | 'error' | 'warning';
@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
   container: {
     borderRadius: BORDER_RADIUS.lg,
     overflow: 'hidden',
-    ...SHADOWS.small,
+    // ...SHADOWS.small,
   },
   gradient: {
     borderWidth: 1,

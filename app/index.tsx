@@ -1,5 +1,4 @@
 // app/index.tsx (Enhanced HomeScreen)
-import Ionicons from '@expo/vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BlurView } from 'expo-blur';
 import * as Location from 'expo-location';
@@ -13,26 +12,22 @@ import {
   StyleSheet,
   Text,
   TextStyle,
-  TouchableOpacity,
   View,
 } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withDelay,
-  withSpring,
   withTiming,
 } from 'react-native-reanimated';
 
-import { getCurrentLanguage, onLanguageChange, SupportedLanguage, t } from '../i18n';
+import { onLanguageChange, t } from '../i18n';
 import {
-  ANIMATIONS,
-  BORDER_RADIUS,
   COLORS,
-  SHADOWS,
   SPACING,
   TYPOGRAPHY,
 } from '../theme/designTokens';
+
 import LanguageSelector from './components/LanguageSelector';
 import Alert from './components/ui/Alert';
 import Button from './components/ui/Button';
@@ -40,21 +35,13 @@ import StatusIndicator from './components/ui/StatusIndicator';
 
 const { width, height } = Dimensions.get('window');
 
-// Language flag mapping
-const languageFlags: Record<SupportedLanguage, string> = {
-  pl: '🇵🇱',
-  en: '🇺🇸',
-  uk: '🇺🇦',
-  es: '🇪🇸',
-};
 
 export default function HomeScreen() {
   const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [isParking, setIsParking] = useState<boolean>(false);
-  const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('pl');
-  const [showLanguageSelector, setShowLanguageSelector] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [languageKey, setLanguageKey] = useState(0); // Force re-render on language change
 
   // Alert State
   const [alertConfig, setAlertConfig] = useState({
@@ -74,7 +61,6 @@ export default function HomeScreen() {
   const contentOpacity = useSharedValue(0);
   const statusOpacity = useSharedValue(0);
   const buttonsOpacity = useSharedValue(0);
-  const languageButtonScale = useSharedValue(1);
 
   // Initialize animations
   useEffect(() => {
@@ -88,15 +74,14 @@ export default function HomeScreen() {
     setTimeout(animateIn, 100);
   }, [headerOpacity, contentOpacity, statusOpacity, buttonsOpacity]);
 
-  // Language change listener and initialization
+  // Listen for language changes
   useEffect(() => {
-    setCurrentLanguage(getCurrentLanguage());
-    
-    const unsubscribe = onLanguageChange((language) => {
-      setCurrentLanguage(language);
+    const unsubscribe = onLanguageChange(() => {
+      setLanguageKey(prev => prev + 1); // Force re-render
     });
     return unsubscribe;
   }, []);
+
 
   // Custom Alert Function
   const showAlert = (
@@ -310,17 +295,6 @@ export default function HomeScreen() {
     ],
   }));
 
-  const languageButtonAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: languageButtonScale.value }],
-  }));
-
-  const handleLanguageButtonPress = () => {
-    languageButtonScale.value = withSpring(0.95, ANIMATIONS.spring.bouncy);
-    setTimeout(() => {
-      languageButtonScale.value = withSpring(1, ANIMATIONS.spring.bouncy);
-      setShowLanguageSelector(true);
-    }, 150);
-  };
 
   if (hasPermission === null) {
     return (
@@ -351,7 +325,7 @@ export default function HomeScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView key={languageKey} style={styles.container}>
       {/* Background Lottie Animation */}
       <LottieView
         source={require('../assets/animations/Globe.json')}
@@ -368,25 +342,10 @@ export default function HomeScreen() {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          {/* Language Selector Button */}
-          <Animated.View style={[styles.languageButtonContainer, languageButtonAnimatedStyle]}>
-            <TouchableOpacity
-              onPress={handleLanguageButtonPress}
-              activeOpacity={0.8}
-              style={styles.languageButton}
-              testID="language-selector-button"
-            >
-              <Text style={styles.languageFlag}>
-                {languageFlags[currentLanguage]}
-              </Text>
-              <View style={styles.languageTextContainer}>
-                <Text style={styles.languageButtonText}>
-                  {currentLanguage.toUpperCase()}
-                </Text>
-                <Ionicons name="chevron-down" size={16} color={COLORS.text.secondary} />
-              </View>
-            </TouchableOpacity>
-          </Animated.View>
+          {/* Language Selector */}
+          <View style={styles.languageSelectorContainer}>
+            <LanguageSelector />
+          </View>
 
           {/* Header */}
           <Animated.View style={[styles.header, headerAnimatedStyle]}>
@@ -491,10 +450,7 @@ export default function HomeScreen() {
       />
 
       {/* Language Selector */}
-      <LanguageSelector
-        visible={showLanguageSelector}
-        onClose={() => setShowLanguageSelector(false)}
-      />
+
     </SafeAreaView>
   );
 }
@@ -524,36 +480,10 @@ const styles = StyleSheet.create({
     paddingTop: SPACING.xl,
     paddingBottom: SPACING.xxxl,
   },
-  languageButtonContainer: {
+  languageSelectorContainer: {
     alignSelf: 'flex-end',
     marginBottom: SPACING.lg,
   },
-  languageButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.background.blur,
-    paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.md,
-    borderRadius: BORDER_RADIUS.xxl,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
-    ...SHADOWS.medium,
-    minHeight: 48,
-  },
-  languageFlag: {
-    fontSize: 24,
-    marginRight: SPACING.sm,
-  },
-  languageTextContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  languageButtonText: {
-    color: COLORS.text.primary,
-    fontSize: TYPOGRAPHY.fontSizes.sm,
-    fontWeight: TYPOGRAPHY.fontWeights.bold as any,
-    marginRight: SPACING.xs,
-  } as TextStyle,
   header: {
     alignItems: 'center',
     marginBottom: SPACING.xl,
