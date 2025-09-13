@@ -1,0 +1,51 @@
+{
+  "common": {
+    "ok": "OK",
+    "cancel": "Cancelar",
+    "error": "Error",
+    "success": "Éxito",
+    "info": "Información",
+    "loading": "Cargando...",
+    "pleaseWait": "Por favor espere..."
+  },
+  "permissions": {
+    "locationDenied": "Sin permisos",
+    "locationDeniedMessage": "Para usar la aplicación, debes otorgar acceso a la ubicación.",
+    "locationAccessError": "No se puede acceder a la ubicación.",
+    "requestingPermission": "Solicitando permiso de ubicación..."
+  },
+  "parking": {
+    "title": "¿Dónde aparcas? 🚗",
+    "parkingHere": "Estás aparcando aquí 🚗",
+    "startParking": "Iniciar aparcamiento",
+    "endParking": "Finalizar aparcamiento",
+    "navigateToCar": "Navegar al coche",
+    "parkingActive": "Aparcamiento en curso 🟢",
+    "startSuccess": "¡Aparcamiento iniciado! 🚗",
+    "endSuccess": "¡Aparcamiento finalizado! 🏁",
+    "noLocation": "Sin ubicación",
+    "noLocationMessage": "Primero inicia el aparcamiento.",
+    "saveError": "No se pudo guardar la ubicación.",
+    "clearError": "No se pudo finalizar el aparcamiento.",
+    "mapsError": "No se puede abrir Google Maps.",
+    "parkingActiveSubtitle": "Tu coche está aparcado en esta ubicación",
+    "welcomeSubtitle": "¡Guarda la ubicación de tu coche y nunca lo pierdas!",
+    "parkingActiveDescription": "Ahora puedes navegar a tu coche",
+    "noParkingActive": "Sin aparcamiento activo",
+    "readyToStart": "Listo para iniciar aparcamiento",
+    "confirmEnd": "¿Finalizar aparcamiento?",
+    "confirmEndMessage": "¿Estás seguro de que quieres finalizar el aparcamiento?",
+    "loadError": "No se pudo cargar la ubicación guardada",
+    "parkingInfoActive": "Tu coche está aparcado",
+    "parkingInfoInactive": "Inicia el aparcamiento para guardar la ubicación"
+  },
+  "language": {
+    "select": "Seleccionar idioma",
+    "selectLanguage": "Seleccionar Idioma",
+    "restartNote": "La aplicación se reiniciará para aplicar los cambios de idioma.",
+    "polish": "Polski",
+    "english": "English",
+    "ukrainian": "Українська",
+    "spanish": "Español"
+  }
+}

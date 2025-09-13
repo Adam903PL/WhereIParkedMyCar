@@ -1,0 +1,51 @@
+{
+  "common": {
+    "ok": "OK",
+    "cancel": "Anuluj",
+    "error": "Błąd",
+    "success": "Sukces",
+    "info": "Informacja",
+    "loading": "Ładowanie...",
+    "pleaseWait": "Proszę czekać..."
+  },
+  "permissions": {
+    "locationDenied": "Brak uprawnień",
+    "locationDeniedMessage": "Aby korzystać z aplikacji, musisz udzielić dostępu do lokalizacji.",
+    "locationAccessError": "Nie można uzyskać dostępu do lokalizacji.",
+    "requestingPermission": "Żądanie uprawnień lokalizacji..."
+  },
+  "parking": {
+    "title": "Gdzie parkujesz? 🚗",
+    "parkingHere": "Parkujesz tutaj 🚗",
+    "startParking": "Rozpocznij parkowanie",
+    "endParking": "Zakończ parkowanie",
+    "navigateToCar": "Prowadź do auta",
+    "parkingActive": "Trwa parkowanie 🟢",
+    "startSuccess": "Rozpoczęto parkowanie! 🚗",
+    "endSuccess": "Parkowanie zakończone! 🏁",
+    "noLocation": "Brak lokalizacji",
+    "noLocationMessage": "Najpierw rozpocznij parkowanie.",
+    "saveError": "Nie udało się zapisać lokalizacji.",
+    "clearError": "Nie udało się zakończyć parkowania.",
+    "mapsError": "Nie można otworzyć Google Maps.",
+    "parkingActiveSubtitle": "Twój samochód jest zaparkowany w tej lokalizacji",
+    "welcomeSubtitle": "Zapisz lokalizację swojego samochodu i nigdy go nie zgub!",
+    "parkingActiveDescription": "Możesz teraz nawigować do swojego samochodu",
+    "noParkingActive": "Brak aktywnego parkowania",
+    "readyToStart": "Gotowy do rozpoczęcia parkowania",
+    "confirmEnd": "Zakończyć parkowanie?",
+    "confirmEndMessage": "Czy na pewno chcesz zakończyć parkowanie?",
+    "loadError": "Nie udało się załadować zapisanej lokalizacji",
+    "parkingInfoActive": "Twój samochód jest zaparkowany",
+    "parkingInfoInactive": "Rozpocznij parkowanie, aby zapisać lokalizację"
+  },
+  "language": {
+    "select": "Wybierz język",
+    "selectLanguage": "Wybierz język",
+    "restartNote": "Aby zmiany zostały zastosowane, aplikacja zostanie ponownie uruchomiona.",
+    "polish": "Polski",
+    "english": "English",
+    "ukrainian": "Українська",
+    "spanish": "Español"
+  }
+}

@@ -24,7 +24,7 @@ import {
   setLanguage,
   SupportedLanguage,
   t,
-} from '../i18n';
+} from '../../i18n';
 import {
   ANIMATIONS,
   BORDER_RADIUS,
@@ -32,7 +32,7 @@ import {
   SHADOWS,
   SPACING,
   TYPOGRAPHY,
-} from '../theme/designTokens';
+} from '../../theme/designTokens';
 
 const { width, height } = Dimensions.get('window');
 
@@ -48,7 +48,7 @@ const languageFlags: Record<SupportedLanguage, string> = {
   es: '🇪🇸',
 };
 
-export function LanguageSelector({ visible, onClose }: LanguageSelectorProps) {
+function LanguageSelector({ visible, onClose }: LanguageSelectorProps) {
   const backdropOpacity = useSharedValue(0);
   const modalScale = useSharedValue(0.8);
   const modalOpacity = useSharedValue(0);
@@ -88,7 +88,10 @@ export function LanguageSelector({ visible, onClose }: LanguageSelectorProps) {
     onClose();
   };
 
-  // Always render the modal when visible is true
+  if (!visible) {
+    return null;
+  }
+
   return (
     <Modal
       visible={visible}
@@ -117,7 +120,7 @@ export function LanguageSelector({ visible, onClose }: LanguageSelectorProps) {
                       <Ionicons name="close" size={24} color={COLORS.text.primary} />
                     </TouchableOpacity>
                   </View>
-
+                  
                   {/* Language Options */}
                   <ScrollView 
                     style={styles.languageList}
@@ -126,7 +129,7 @@ export function LanguageSelector({ visible, onClose }: LanguageSelectorProps) {
                     {Object.entries(supportedLanguages).map(([code, name]) => {
                       const languageCode = code as SupportedLanguage;
                       const isSelected = languageCode === currentLanguage;
-
+                      
                       return (
                         <TouchableOpacity
                           key={languageCode}
@@ -183,10 +186,14 @@ export function LanguageSelector({ visible, onClose }: LanguageSelectorProps) {
       </Animated.View>
     </Modal>
   );
-}const styles = StyleSheet.create({
+}
+
+const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   backdropTouchable: {
     flex: 1,
@@ -196,20 +203,21 @@ export function LanguageSelector({ visible, onClose }: LanguageSelectorProps) {
     justifyContent: 'center',
     alignItems: 'center',
     padding: SPACING.xl,
+    width: '100%',
   },
   modal: {
     width: Math.min(width - SPACING.xl * 2, 400),
-    maxHeight: height * 0.8,
+    height: Math.min(height * 0.7, 500),
     borderRadius: BORDER_RADIUS.xxl,
     overflow: 'hidden',
+    backgroundColor: '#2a2a2a',
+    borderWidth: 2,
+    borderColor: '#444444',
     ...SHADOWS.xl,
-    // Add explicit background color as fallback
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
   },
   blurContainer: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
-    // Ensure minimum height
+    backgroundColor: '#333333',
     minHeight: 300,
   },
   header: {
@@ -219,22 +227,24 @@ export function LanguageSelector({ visible, onClose }: LanguageSelectorProps) {
     paddingHorizontal: SPACING.xl,
     paddingVertical: SPACING.lg,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.1)',
+    borderBottomColor: '#666666',
   },
   title: {
     fontSize: TYPOGRAPHY.fontSizes.xl,
     fontWeight: TYPOGRAPHY.fontWeights.bold as any,
-    color: COLORS.text.primary,
+    color: '#FFFFFF',
+    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   closeButton: {
     padding: SPACING.sm,
     borderRadius: BORDER_RADIUS.full,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: '#555555',
   },
   languageList: {
     flex: 1,
     paddingHorizontal: SPACING.md,
-    // Ensure it takes up space
     minHeight: 200,
   },
   languageOption: {
@@ -245,15 +255,14 @@ export function LanguageSelector({ visible, onClose }: LanguageSelectorProps) {
     paddingVertical: SPACING.md,
     marginVertical: SPACING.xs,
     borderRadius: BORDER_RADIUS.lg,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: '#444444',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-    // Ensure minimum height
+    borderColor: '#666666',
     minHeight: 60,
   },
   selectedLanguageOption: {
-    backgroundColor: 'rgba(76, 175, 80, 0.1)',
-    borderColor: COLORS.success[500],
+    backgroundColor: '#4CAF50',
+    borderColor: '#66BB6A',
   },
   languageInfo: {
     flexDirection: 'row',
@@ -270,32 +279,48 @@ export function LanguageSelector({ visible, onClose }: LanguageSelectorProps) {
   languageName: {
     fontSize: TYPOGRAPHY.fontSizes.lg,
     fontWeight: TYPOGRAPHY.fontWeights.medium as any,
-    color: COLORS.text.primary,
+    color: '#FFFFFF',
     marginBottom: 2,
+    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   selectedLanguageName: {
-    color: COLORS.success[400],
+    color: '#FFFFFF',
     fontWeight: TYPOGRAPHY.fontWeights.bold as any,
+    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   languageCode: {
     fontSize: TYPOGRAPHY.fontSizes.sm,
-    color: COLORS.text.tertiary,
+    color: '#FFFFFF',
+    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   selectedLanguageCode: {
-    color: COLORS.success[300],
+    color: '#FFFFFF',
+    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   footer: {
     paddingHorizontal: SPACING.xl,
     paddingVertical: SPACING.md,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.1)',
+    borderTopColor: '#666666',
     alignItems: 'center',
   },
   footerText: {
     fontSize: TYPOGRAPHY.fontSizes.sm,
-    color: COLORS.text.tertiary,
+    color: '#FFFFFF',
     textAlign: 'center',
     fontStyle: 'italic',
+    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
 });
 
+export default LanguageSelector;

@@ -1,0 +1,51 @@
+{
+  "common": {
+    "ok": "OK",
+    "cancel": "Cancel",
+    "error": "Error",
+    "success": "Success",
+    "info": "Information",
+    "loading": "Loading...",
+    "pleaseWait": "Please wait..."
+  },
+  "permissions": {
+    "locationDenied": "No permissions",
+    "locationDeniedMessage": "To use the app, you must grant access to location.",
+    "locationAccessError": "Cannot access location.",
+    "requestingPermission": "Requesting location permission..."
+  },
+  "parking": {
+    "title": "Where do you park? 🚗",
+    "parkingHere": "You're parking here 🚗",
+    "startParking": "Start parking",
+    "endParking": "End parking",
+    "navigateToCar": "Navigate to car",
+    "parkingActive": "Parking in progress 🟢",
+    "startSuccess": "Parking started! 🚗",
+    "endSuccess": "Parking ended! 🏁",
+    "noLocation": "No location",
+    "noLocationMessage": "Start parking first.",
+    "saveError": "Failed to save location.",
+    "clearError": "Failed to end parking.",
+    "mapsError": "Cannot open Google Maps.",
+    "parkingActiveSubtitle": "Your car is parked at this location",
+    "welcomeSubtitle": "Save your car's location and never lose it again!",
+    "parkingActiveDescription": "You can now navigate to your car",
+    "noParkingActive": "No active parking",
+    "readyToStart": "Ready to start parking",
+    "confirmEnd": "End parking?",
+    "confirmEndMessage": "Are you sure you want to end parking?",
+    "loadError": "Failed to load saved location",
+    "parkingInfoActive": "Your car is parked",
+    "parkingInfoInactive": "Start parking to save location"
+  },
+  "language": {
+    "select": "Select language",
+    "selectLanguage": "Select Language",
+    "restartNote": "The app will restart to apply language changes.",
+    "polish": "Polski",
+    "english": "English",
+    "ukrainian": "Українська",
+    "spanish": "Español"
+  }
+}
