@@ -1,4 +1,3 @@
-// app/components/LanguageSelector.tsx
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { BlurView } from 'expo-blur';
 import React from 'react';
@@ -48,16 +47,13 @@ const languageFlags: Record<SupportedLanguage, string> = {
   es: '🇪🇸',
 };
 
-function LanguageSelector({ visible, onClose }: LanguageSelectorProps) {
+export default function LanguageSelector({ visible, onClose }: LanguageSelectorProps) {
   const backdropOpacity = useSharedValue(0);
   const modalScale = useSharedValue(0.8);
   const modalOpacity = useSharedValue(0);
 
   const currentLanguage = getCurrentLanguage();
   const supportedLanguages = getSupportedLanguages();
-  
-  // Debug log
-  console.log('LanguageSelector debug:', { currentLanguage, supportedLanguages });
 
   React.useEffect(() => {
     if (visible) {
@@ -123,13 +119,13 @@ function LanguageSelector({ visible, onClose }: LanguageSelectorProps) {
                       <Ionicons name="close" size={24} color={COLORS.text.primary} />
                     </TouchableOpacity>
                   </View>
-                  
+
                   {/* Language Options */}
                   <ScrollView 
                     style={styles.languageList}
                     showsVerticalScrollIndicator={false}
                   >
-                    {supportedLanguages ? Object.entries(supportedLanguages).map(([code, name]) => {
+                    {Object.entries(supportedLanguages).map(([code, name]) => {
                       const languageCode = code as SupportedLanguage;
                       const isSelected = languageCode === currentLanguage;
                       
@@ -172,7 +168,7 @@ function LanguageSelector({ visible, onClose }: LanguageSelectorProps) {
                           )}
                         </TouchableOpacity>
                       );
-                    }) : null}
+                    })}
                   </ScrollView>
 
                   {/* Footer */}
@@ -194,12 +190,15 @@ function LanguageSelector({ visible, onClose }: LanguageSelectorProps) {
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   backdropTouchable: {
     flex: 1,
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   modalContainer: {
     flex: 1,
@@ -213,15 +212,12 @@ const styles = StyleSheet.create({
     height: Math.min(height * 0.7, 500),
     borderRadius: BORDER_RADIUS.xxl,
     overflow: 'hidden',
-    backgroundColor: '#2a2a2a',
-    borderWidth: 2,
-    borderColor: '#444444',
+    backgroundColor: 'rgba(0, 0, 0, 0.9)',
     ...SHADOWS.xl,
   },
   blurContainer: {
     flex: 1,
-    backgroundColor: '#333333',
-    minHeight: 300,
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
   },
   header: {
     flexDirection: 'row',
@@ -230,25 +226,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.xl,
     paddingVertical: SPACING.lg,
     borderBottomWidth: 1,
-    borderBottomColor: '#666666',
+    borderBottomColor: 'rgba(255, 255, 255, 0.1)',
   },
   title: {
     fontSize: TYPOGRAPHY.fontSizes.xl,
     fontWeight: TYPOGRAPHY.fontWeights.bold as any,
-    color: '#FFFFFF',
-    textShadowColor: 'rgba(0, 0, 0, 0.8)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
+    color: COLORS.text.primary,
   },
   closeButton: {
     padding: SPACING.sm,
     borderRadius: BORDER_RADIUS.full,
-    backgroundColor: '#555555',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
   },
   languageList: {
     flex: 1,
     paddingHorizontal: SPACING.md,
-    minHeight: 200,
   },
   languageOption: {
     flexDirection: 'row',
@@ -258,14 +250,14 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.md,
     marginVertical: SPACING.xs,
     borderRadius: BORDER_RADIUS.lg,
-    backgroundColor: '#444444',
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderWidth: 1,
-    borderColor: '#666666',
+    borderColor: 'rgba(255, 255, 255, 0.1)',
     minHeight: 60,
   },
   selectedLanguageOption: {
-    backgroundColor: '#4CAF50',
-    borderColor: '#66BB6A',
+    backgroundColor: 'rgba(76, 175, 80, 0.1)',
+    borderColor: COLORS.success[500],
   },
   languageInfo: {
     flexDirection: 'row',
@@ -282,48 +274,31 @@ const styles = StyleSheet.create({
   languageName: {
     fontSize: TYPOGRAPHY.fontSizes.lg,
     fontWeight: TYPOGRAPHY.fontWeights.medium as any,
-    color: '#FFFFFF',
+    color: COLORS.text.primary,
     marginBottom: 2,
-    textShadowColor: 'rgba(0, 0, 0, 0.8)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
   },
   selectedLanguageName: {
-    color: '#FFFFFF',
+    color: COLORS.success[400],
     fontWeight: TYPOGRAPHY.fontWeights.bold as any,
-    textShadowColor: 'rgba(0, 0, 0, 0.8)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
   },
   languageCode: {
     fontSize: TYPOGRAPHY.fontSizes.sm,
-    color: '#FFFFFF',
-    textShadowColor: 'rgba(0, 0, 0, 0.8)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
+    color: COLORS.text.tertiary,
   },
   selectedLanguageCode: {
-    color: '#FFFFFF',
-    textShadowColor: 'rgba(0, 0, 0, 0.8)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
+    color: COLORS.success[300],
   },
   footer: {
     paddingHorizontal: SPACING.xl,
     paddingVertical: SPACING.md,
     borderTopWidth: 1,
-    borderTopColor: '#666666',
+    borderTopColor: 'rgba(255, 255, 255, 0.1)',
     alignItems: 'center',
   },
   footerText: {
     fontSize: TYPOGRAPHY.fontSizes.sm,
-    color: '#FFFFFF',
+    color: COLORS.text.tertiary,
     textAlign: 'center',
     fontStyle: 'italic',
-    textShadowColor: 'rgba(0, 0, 0, 0.8)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
   },
 });
-
-export default LanguageSelector;
