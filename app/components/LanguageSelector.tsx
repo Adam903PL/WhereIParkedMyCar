@@ -55,6 +55,9 @@ function LanguageSelector({ visible, onClose }: LanguageSelectorProps) {
 
   const currentLanguage = getCurrentLanguage();
   const supportedLanguages = getSupportedLanguages();
+  
+  // Debug log
+  console.log('LanguageSelector debug:', { currentLanguage, supportedLanguages });
 
   React.useEffect(() => {
     if (visible) {
@@ -126,7 +129,7 @@ function LanguageSelector({ visible, onClose }: LanguageSelectorProps) {
                     style={styles.languageList}
                     showsVerticalScrollIndicator={false}
                   >
-                    {Object.entries(supportedLanguages).map(([code, name]) => {
+                    {supportedLanguages ? Object.entries(supportedLanguages).map(([code, name]) => {
                       const languageCode = code as SupportedLanguage;
                       const isSelected = languageCode === currentLanguage;
                       
@@ -169,7 +172,7 @@ function LanguageSelector({ visible, onClose }: LanguageSelectorProps) {
                           )}
                         </TouchableOpacity>
                       );
-                    })}
+                    }) : null}
                   </ScrollView>
 
                   {/* Footer */}
