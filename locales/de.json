@@ -1,0 +1,53 @@
+{
+  "common": {
+    "ok": "OK",
+    "cancel": "Abbrechen",
+    "error": "Fehler",
+    "success": "Erfolg",
+    "info": "Information",
+    "loading": "Laden...",
+    "pleaseWait": "Bitte warten..."
+  },
+  "permissions": {
+    "locationDenied": "Keine Berechtigung",
+    "locationDeniedMessage": "Um die App zu verwenden, müssen Sie den Zugriff auf den Standort gewähren.",
+    "locationAccessError": "Kann nicht auf Standort zugreifen.",
+    "requestingPermission": "Standortberechtigung wird angefordert..."
+  },
+  "parking": {
+    "title": "Wo parkst du? 🚗",
+    "parkingHere": "Du parkst hier 🚗",
+    "startParking": "Parken starten",
+    "endParking": "Parken beenden",
+    "navigateToCar": "Zum Auto navigieren",
+    "parkingActive": "Parken läuft 🟢",
+    "startSuccess": "Parken gestartet! 🚗",
+    "endSuccess": "Parken beendet! 🏁",
+    "noLocation": "Kein Standort",
+    "noLocationMessage": "Starten Sie zuerst das Parken.",
+    "saveError": "Standort konnte nicht gespeichert werden.",
+    "clearError": "Parken konnte nicht beendet werden.",
+    "mapsError": "Google Maps kann nicht geöffnet werden.",
+    "parkingActiveSubtitle": "Ihr Auto ist an diesem Standort geparkt",
+    "welcomeSubtitle": "Speichern Sie den Standort Ihres Autos und verlieren Sie es nie wieder!",
+    "parkingActiveDescription": "Sie können jetzt zu Ihrem Auto navigieren",
+    "noParkingActive": "Kein aktives Parken",
+    "readyToStart": "Bereit zum Parken",
+    "confirmEnd": "Parken beenden?",
+    "confirmEndMessage": "Sind Sie sicher, dass Sie das Parken beenden möchten?",
+    "loadError": "Gespeicherter Standort konnte nicht geladen werden",
+    "parkingInfoActive": "Ihr Auto ist geparkt",
+    "parkingInfoInactive": "Starten Sie das Parken, um den Standort zu speichern"
+  },
+  "language": {
+    "select": "Sprache auswählen",
+    "selectLanguage": "Sprache auswählen",
+    "restartNote": "Die App wird neu gestartet, um die Sprachänderungen anzuwenden.",
+    "polish": "Polski",
+    "english": "English",
+    "ukrainian": "Українська",
+    "spanish": "Español",
+    "german": "Deutsch",
+    "french": "Français"
+  }
+}

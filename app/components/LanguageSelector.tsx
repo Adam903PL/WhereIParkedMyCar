@@ -26,6 +26,8 @@ const languageConfig: Record<SupportedLanguage, { flag: string; name: string }> 
   en: { flag: '🇺🇸', name: 'English' },
   uk: { flag: '🇺🇦', name: 'Українська' },
   es: { flag: '🇪🇸', name: 'Español' },
+  de: { flag: '🇩🇪', name: 'Deutsch' },
+  fr: { flag: '🇫🇷', name: 'Français' },
 };
 
 interface LanguageSelectorProps {

@@ -1,0 +1,53 @@
+{
+  "common": {
+    "ok": "OK",
+    "cancel": "Annuler",
+    "error": "Erreur",
+    "success": "Succès",
+    "info": "Information",
+    "loading": "Chargement...",
+    "pleaseWait": "Veuillez patienter..."
+  },
+  "permissions": {
+    "locationDenied": "Aucune autorisation",
+    "locationDeniedMessage": "Pour utiliser l'application, vous devez accorder l'accès à la localisation.",
+    "locationAccessError": "Impossible d'accéder à la localisation.",
+    "requestingPermission": "Demande d'autorisation de localisation..."
+  },
+  "parking": {
+    "title": "Où vous garez-vous ? 🚗",
+    "parkingHere": "Vous vous garez ici 🚗",
+    "startParking": "Commencer le stationnement",
+    "endParking": "Terminer le stationnement",
+    "navigateToCar": "Naviguer vers la voiture",
+    "parkingActive": "Stationnement en cours 🟢",
+    "startSuccess": "Stationnement commencé ! 🚗",
+    "endSuccess": "Stationnement terminé ! 🏁",
+    "noLocation": "Aucune localisation",
+    "noLocationMessage": "Commencez d'abord le stationnement.",
+    "saveError": "Impossible d'enregistrer la localisation.",
+    "clearError": "Impossible de terminer le stationnement.",
+    "mapsError": "Impossible d'ouvrir Google Maps.",
+    "parkingActiveSubtitle": "Votre voiture est garée à cet endroit",
+    "welcomeSubtitle": "Enregistrez l'emplacement de votre voiture et ne la perdez plus jamais !",
+    "parkingActiveDescription": "Vous pouvez maintenant naviguer vers votre voiture",
+    "noParkingActive": "Aucun stationnement actif",
+    "readyToStart": "Prêt à commencer le stationnement",
+    "confirmEnd": "Terminer le stationnement ?",
+    "confirmEndMessage": "Êtes-vous sûr de vouloir terminer le stationnement ?",
+    "loadError": "Impossible de charger la localisation enregistrée",
+    "parkingInfoActive": "Votre voiture est garée",
+    "parkingInfoInactive": "Commencez le stationnement pour enregistrer la localisation"
+  },
+  "language": {
+    "select": "Sélectionner la langue",
+    "selectLanguage": "Sélectionner la langue",
+    "restartNote": "L'application va redémarrer pour appliquer les changements de langue.",
+    "polish": "Polski",
+    "english": "English",
+    "ukrainian": "Українська",
+    "spanish": "Español",
+    "german": "Deutsch",
+    "french": "Français"
+  }
+}

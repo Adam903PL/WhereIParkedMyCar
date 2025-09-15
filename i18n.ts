@@ -2,8 +2,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Localization from 'expo-localization';
 
 // Import translation files
+import de from './locales/de.json';
 import en from './locales/en.json';
 import es from './locales/es.json';
+import fr from './locales/fr.json';
 import pl from './locales/pl.json';
 import uk from './locales/uk.json';
 
@@ -13,6 +15,8 @@ export const supportedLanguages = {
   en: 'English',
   uk: 'Українська',
   es: 'Español',
+  de: 'Deutsch',
+  fr: 'Français',
 } as const;
 
 export type SupportedLanguage = keyof typeof supportedLanguages;
@@ -23,6 +27,8 @@ const resources = {
   en,
   uk,
   es,
+  de,
+  fr,
 };
 
 // Language detection and storage
@@ -30,7 +36,7 @@ const LANGUAGE_STORAGE_KEY = 'app_language';
 
 class CustomI18nManager {
   private currentLanguage: SupportedLanguage = 'pl';
-  private listeners: Array<(language: SupportedLanguage) => void> = [];
+  private listeners: ((language: SupportedLanguage) => void)[] = [];
   private isInitialized = false;
 
   constructor() {
@@ -86,6 +92,15 @@ class CustomI18nManager {
       'es': 'es',
       'es-ES': 'es',
       'es-MX': 'es',
+      'de': 'de',
+      'de-DE': 'de',
+      'de-AT': 'de',
+      'de-CH': 'de',
+      'fr': 'fr',
+      'fr-FR': 'fr',
+      'fr-CA': 'fr',
+      'fr-BE': 'fr',
+      'fr-CH': 'fr',
     };
     
     if (deviceLocale in languageMap) {

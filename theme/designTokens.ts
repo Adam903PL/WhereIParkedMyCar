@@ -100,6 +100,32 @@ export const COLORS = {
     tertiary: 'rgba(255, 255, 255, 0.7)',
     disabled: 'rgba(255, 255, 255, 0.5)',
   },
+
+  // Timer colors
+  timer: {
+    background: {
+      primary: 'rgba(30, 136, 229, 0.15)',
+      secondary: 'rgba(16, 185, 129, 0.15)',
+      warning: 'rgba(245, 158, 11, 0.15)',
+      danger: 'rgba(239, 68, 68, 0.15)',
+    },
+    border: {
+      primary: 'rgba(30, 136, 229, 0.3)',
+      secondary: 'rgba(16, 185, 129, 0.3)',
+      warning: 'rgba(245, 158, 11, 0.3)',
+      danger: 'rgba(239, 68, 68, 0.3)',
+    },
+    text: {
+      primary: '#1E88E5',
+      secondary: '#10B981',
+      warning: '#F59E0B',
+      danger: '#EF4444',
+    },
+    accent: {
+      glow: 'rgba(59, 130, 246, 0.4)',
+      pulse: 'rgba(16, 185, 129, 0.6)',
+    },
+  },
 };
 
 export const SPACING = {

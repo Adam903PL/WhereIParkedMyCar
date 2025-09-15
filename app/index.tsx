@@ -31,6 +31,7 @@ import {
 import LanguageSelector from './components/LanguageSelector';
 import Alert from './components/ui/Alert';
 import Button from './components/ui/Button';
+import ParkingTimer from './components/ui/ParkingTimer';
 import StatusIndicator from './components/ui/StatusIndicator';
 
 const { width, height } = Dimensions.get('window');
@@ -40,6 +41,7 @@ export default function HomeScreen() {
   const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [isParking, setIsParking] = useState<boolean>(false);
+  const [parkingStartTime, setParkingStartTime] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [languageKey, setLanguageKey] = useState(0); // Force re-render on language change
 
@@ -111,13 +113,26 @@ export default function HomeScreen() {
     try {
       setIsLoading(true);
       const saved = await AsyncStorage.getItem('parkedLocation');
+      const savedStartTime = await AsyncStorage.getItem('parkingStartTime');
+      
       if (saved) {
         const parsedLocation = JSON.parse(saved);
         setLocation(parsedLocation);
         setIsParking(true);
+        
+        // Load parking start time
+        if (savedStartTime) {
+          setParkingStartTime(parseInt(savedStartTime, 10));
+        } else {
+          // If no start time saved, use current time (fallback for existing users)
+          const fallbackTime = Date.now();
+          setParkingStartTime(fallbackTime);
+          await AsyncStorage.setItem('parkingStartTime', fallbackTime.toString());
+        }
       } else {
         setLocation(null);
         setIsParking(false);
+        setParkingStartTime(null);
       }
     } catch (error) {
       console.error('Error loading location:', error);
@@ -172,9 +187,13 @@ export default function HomeScreen() {
         accuracy: Location.Accuracy.High,
       });
       const { latitude, longitude } = currentLocation.coords;
+      const startTime = Date.now();
 
       await AsyncStorage.setItem('parkedLocation', JSON.stringify({ latitude, longitude }));
+      await AsyncStorage.setItem('parkingStartTime', startTime.toString());
+      
       setLocation({ latitude, longitude });
+      setParkingStartTime(startTime);
       setIsParking(true);
       
       showAlert(
@@ -218,7 +237,9 @@ export default function HomeScreen() {
             setIsLoading(true);
             try {
               await AsyncStorage.removeItem('parkedLocation');
+              await AsyncStorage.removeItem('parkingStartTime');
               setLocation(null);
+              setParkingStartTime(null);
               setIsParking(false);
               showAlert(t('common.success'), t('parking.endSuccess'), 'success');
             } catch (error) {
@@ -387,6 +408,16 @@ export default function HomeScreen() {
             )}
           </Animated.View>
           
+          {/* Parking Timer */}
+          {isParking && parkingStartTime && (
+            <Animated.View style={[styles.timerContainer, statusAnimatedStyle]}>
+              <ParkingTimer
+                startTime={parkingStartTime}
+                isActive={isParking}
+              />
+            </Animated.View>
+          )}
+          
           {/* Action Buttons */}
           <Animated.View style={[styles.buttonsContainer, buttonsAnimatedStyle]}>
             {!isParking ? (
@@ -506,6 +537,9 @@ const styles = StyleSheet.create({
     lineHeight: TYPOGRAPHY.fontSizes.lg * TYPOGRAPHY.lineHeights.normal,
   } as TextStyle,
   statusContainer: {
+    marginBottom: SPACING.xl,
+  },
+  timerContainer: {
     marginBottom: SPACING.xl,
   },
   buttonsContainer: {
