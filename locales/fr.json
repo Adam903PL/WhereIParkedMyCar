@@ -49,5 +49,28 @@
     "spanish": "Español",
     "german": "Deutsch",
     "french": "Français"
+  },
+  "compass": {
+    "title": "Navigation Boussole",
+    "openCompass": "Ouvrir la boussole",
+    "backToHome": "Retour à l'accueil",
+    "distanceToCar": "Distance à la voiture",
+    "directionToCar": "Direction vers la voiture",
+    "meters": "m",
+    "kilometers": "km",
+    "north": "Nord",
+    "south": "Sud",
+    "east": "Est",
+    "west": "Ouest",
+    "northeast": "Nord-Est",
+    "northwest": "Nord-Ouest",
+    "southeast": "Sud-Est",
+    "southwest": "Sud-Ouest",
+    "calibrating": "Calibrage de la boussole...",
+    "calibrationComplete": "Boussole calibrée",
+    "accuracy": "Précision",
+    "poor": "Faible",
+    "good": "Bonne",
+    "excellent": "Excellente"
   }
 }

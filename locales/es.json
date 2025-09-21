@@ -49,5 +49,28 @@
     "spanish": "Español",
     "german": "Deutsch",
     "french": "Français"
+  },
+  "compass": {
+    "title": "Navegación con Brújula",
+    "openCompass": "Abrir Brújula",
+    "backToHome": "Volver al Inicio",
+    "distanceToCar": "Distancia al coche",
+    "directionToCar": "Dirección al coche",
+    "meters": "m",
+    "kilometers": "km",
+    "north": "Norte",
+    "south": "Sur",
+    "east": "Este",
+    "west": "Oeste",
+    "northeast": "Noreste",
+    "northwest": "Noroeste",
+    "southeast": "Sureste",
+    "southwest": "Suroeste",
+    "calibrating": "Calibrando brújula...",
+    "calibrationComplete": "Brújula calibrada",
+    "accuracy": "Precisión",
+    "poor": "Mala",
+    "good": "Buena",
+    "excellent": "Excelente"
   }
 }

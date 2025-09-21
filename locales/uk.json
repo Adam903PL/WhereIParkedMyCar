@@ -49,5 +49,28 @@
     "spanish": "Español",
     "german": "Deutsch",
     "french": "Français"
+  },
+  "compass": {
+    "title": "Компасна навігація",
+    "openCompass": "Відкрити компас",
+    "backToHome": "Повернутися на головну",
+    "distanceToCar": "Відстань до авто",
+    "directionToCar": "Напрямок до авто",
+    "meters": "м",
+    "kilometers": "км",
+    "north": "Північ",
+    "south": "Південь",
+    "east": "Схід",
+    "west": "Захід",
+    "northeast": "Північний схід",
+    "northwest": "Північний захід",
+    "southeast": "Південний схід",
+    "southwest": "Південний захід",
+    "calibrating": "Калібрування компаса...",
+    "calibrationComplete": "Компас відкалібрований",
+    "accuracy": "Точність",
+    "poor": "Погана",
+    "good": "Добра",
+    "excellent": "Відмінна"
   }
 }

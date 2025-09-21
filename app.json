@@ -4,10 +4,10 @@
     "slug": "where-i-parked-my-car",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/logo1024.png",
     "userInterfaceStyle": "dark",
     "splash": {
-      "image": "./assets/images/splash-icon.png",
+      "image": "./assets/images/logo1024.png",
       "resizeMode": "contain",
       "backgroundColor": "#000000"
     },
@@ -20,25 +20,37 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png",
+        "foregroundImage": "./assets/images/logo1024.png",
+        "backgroundImage": "./assets/images/logo1024.png",
+        "monochromeImage": "./assets/images/logo1024.png",
         "backgroundColor": "#000000"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "package": "com.adampukaluk.whereiparkedmycar",
-      "versionCode": 1
+      "versionCode": 1,
+      "permissions": [
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
+      ]
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/logo1024.png"
     },
+    "scheme": "whereiparkedmycar",
     "plugins": [
       [
         "expo-location",
         {
           "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location to save and navigate to your parked car."
+        }
+      ],
+      [
+        "react-native-google-mobile-ads",
+        {
+          "iosAppId": "ca-app-pub-4881517997860906~9677357388",
+          "androidAppId": "ca-app-pub-4881517997860906~9677357388"
         }
       ],
       "expo-router",
@@ -47,6 +59,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "7e0b61ee-c55b-4637-96f5-29ebbb4f88d8"
+      }
     }
   }
 }

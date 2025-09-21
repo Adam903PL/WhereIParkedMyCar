@@ -1,0 +1,7 @@
+import { ADMOB_APP_OPEN_ID, ADMOB_BANNER_ID } from '@env';
+
+export const ENV = {
+  ADMOB_APP_OPEN_ID: ADMOB_APP_OPEN_ID ,
+  ADMOB_BANNER_ID: ADMOB_BANNER_ID ,
+};
+

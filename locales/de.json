@@ -49,5 +49,28 @@
     "spanish": "Español",
     "german": "Deutsch",
     "french": "Français"
+  },
+  "compass": {
+    "title": "Kompass-Navigation",
+    "openCompass": "Kompass öffnen",
+    "backToHome": "Zurück zur Hauptseite",
+    "distanceToCar": "Entfernung zum Auto",
+    "directionToCar": "Richtung zum Auto",
+    "meters": "m",
+    "kilometers": "km",
+    "north": "Norden",
+    "south": "Süden",
+    "east": "Osten",
+    "west": "Westen",
+    "northeast": "Nordosten",
+    "northwest": "Nordwesten",
+    "southeast": "Südosten",
+    "southwest": "Südwesten",
+    "calibrating": "Kompass wird kalibriert...",
+    "calibrationComplete": "Kompass kalibriert",
+    "accuracy": "Genauigkeit",
+    "poor": "Schlecht",
+    "good": "Gut",
+    "excellent": "Ausgezeichnet"
   }
 }

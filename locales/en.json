@@ -49,5 +49,28 @@
     "spanish": "Español",
     "german": "Deutsch",
     "french": "Français"
+  },
+  "compass": {
+    "title": "Compass Navigation",
+    "openCompass": "Open Compass",
+    "backToHome": "Back to Home",
+    "distanceToCar": "Distance to car",
+    "directionToCar": "Direction to car",
+    "meters": "m",
+    "kilometers": "km",
+    "north": "North",
+    "south": "South",
+    "east": "East",
+    "west": "West",
+    "northeast": "Northeast",
+    "northwest": "Northwest",
+    "southeast": "Southeast",
+    "southwest": "Southwest",
+    "calibrating": "Calibrating compass...",
+    "calibrationComplete": "Compass calibrated",
+    "accuracy": "Accuracy",
+    "poor": "Poor",
+    "good": "Good",
+    "excellent": "Excellent"
   }
 }

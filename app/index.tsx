@@ -1,44 +1,119 @@
 // app/index.tsx (Enhanced HomeScreen)
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { BlurView } from 'expo-blur';
-import * as Location from 'expo-location';
-import LottieView from 'lottie-react-native';
-import React, { useCallback, useEffect, useState } from 'react';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import { BlurView } from "expo-blur";
+import * as Location from "expo-location";
+import { router } from "expo-router";
+import LottieView from "lottie-react-native";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Dimensions,
   Linking,
+  Platform,
   SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   TextStyle,
   View,
-} from 'react-native';
+} from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withDelay,
   withTiming,
-} from 'react-native-reanimated';
+} from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { onLanguageChange, t } from '../i18n';
-import {
-  COLORS,
-  SPACING,
-  TYPOGRAPHY,
-} from '../theme/designTokens';
+import { onLanguageChange, t } from "../i18n";
+import { COLORS, SPACING, TYPOGRAPHY } from "../theme/designTokens";
 
-import LanguageSelector from './components/LanguageSelector';
-import Alert from './components/ui/Alert';
-import Button from './components/ui/Button';
-import ParkingTimer from './components/ui/ParkingTimer';
-import StatusIndicator from './components/ui/StatusIndicator';
+import MobileAds, {
+  AdEventType,
+  AppOpenAd,
+  BannerAd,
+  BannerAdSize,
+  useForeground
+} from "react-native-google-mobile-ads";
 
-const { width, height } = Dimensions.get('window');
+import { ENV } from "../config/env";
+import LanguageSelector from "./components/LanguageSelector";
+import Alert from "./components/ui/Alert";
+import Button from "./components/ui/Button";
+import ParkingTimer from "./components/ui/ParkingTimer";
+import StatusIndicator from "./components/ui/StatusIndicator";
 
+const { width, height } = Dimensions.get("window");
+
+
+// pierwsze id testowe
+const adUnitId = __DEV__ ? 'ca-app-pub-3940256099942544/9257395921' : ENV.ADMOB_APP_OPEN_ID
+const bannerAdUnitId = __DEV__ ? 'ca-app-pub-3940256099942544/9214589741' : ENV.ADMOB_BANNER_ID
+
+// const adUnitId = 'ca-app-pub-4881517997860906/1415723980'
+// const bannerAdUnitId = 'ca-app-pub-4881517997860906/5192167523'
 
 export default function HomeScreen() {
-  const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  // const adUnitId = __DEV__ ? TestIds.APP_OPEN : 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyyyyyy';
+  const bannerRef = useRef<BannerAd>(null);
+  const insets = useSafeAreaInsets();
+  useForeground(() => {
+    Platform.OS === "ios" && bannerRef.current?.load();
+  });
+  MobileAds().initialize().then((adapterStatuses: any) => {
+    console.log('AdMob initialized', adapterStatuses);
+  });
+  useEffect(() => {
+    console.log('🚀 Initializing App Open Ad with ID:', adUnitId);
+    
+    const appOpenAd = AppOpenAd.createForAdRequest(adUnitId, {
+      keywords: ["parking", "car"],
+    });
+
+    const unsubscribeLoaded = appOpenAd.addAdEventListener(
+      AdEventType.LOADED,
+      () => {
+        console.log('✅ App Open Ad loaded successfully');
+        appOpenAd.show();
+      }
+    );
+
+    const unsubscribeError = appOpenAd.addAdEventListener(
+      AdEventType.ERROR,
+      (err) => {
+        console.error('❌ App Open Ad error:', err);
+      }
+    );
+
+    const unsubscribeOpened = appOpenAd.addAdEventListener(
+      AdEventType.OPENED,
+      () => {
+        console.log('🎯 App Open Ad opened');
+      }
+    );
+
+    const unsubscribeClosed = appOpenAd.addAdEventListener(
+      AdEventType.CLOSED,
+      () => {
+        console.log('📱 App Open Ad closed');
+      }
+    );
+
+    console.log('🔄 Loading App Open Ad...');
+    appOpenAd.load();
+
+    return () => {
+      unsubscribeLoaded();
+      unsubscribeError();
+      unsubscribeOpened();
+      unsubscribeClosed();
+    };
+  }, []);
+
+  const [location, setLocation] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [isParking, setIsParking] = useState<boolean>(false);
   const [parkingStartTime, setParkingStartTime] = useState<number | null>(null);
@@ -48,14 +123,16 @@ export default function HomeScreen() {
   // Alert State
   const [alertConfig, setAlertConfig] = useState({
     visible: false,
-    title: '',
-    message: '',
-    variant: 'info' as 'success' | 'error' | 'info' | 'warning',
-    customActions: undefined as {
-      title: string;
-      onPress: () => void;
-      variant?: 'primary' | 'ghost';
-    }[] | undefined,
+    title: "",
+    message: "",
+    variant: "info" as "success" | "error" | "info" | "warning",
+    customActions: undefined as
+      | {
+          title: string;
+          onPress: () => void;
+          variant?: "primary" | "ghost";
+        }[]
+      | undefined,
   });
 
   // Animation values
@@ -72,28 +149,27 @@ export default function HomeScreen() {
       statusOpacity.value = withDelay(400, withTiming(1, { duration: 600 }));
       buttonsOpacity.value = withDelay(600, withTiming(1, { duration: 600 }));
     };
-    
+
     setTimeout(animateIn, 100);
   }, [headerOpacity, contentOpacity, statusOpacity, buttonsOpacity]);
 
   // Listen for language changes
   useEffect(() => {
     const unsubscribe = onLanguageChange(() => {
-      setLanguageKey(prev => prev + 1); // Force re-render
+      setLanguageKey((prev) => prev + 1); // Force re-render
     });
     return unsubscribe;
   }, []);
-
 
   // Custom Alert Function
   const showAlert = (
     title: string,
     message: string,
-    variant: 'success' | 'error' | 'info' | 'warning' = 'info',
+    variant: "success" | "error" | "info" | "warning" = "info",
     customActions?: {
       title: string;
       onPress: () => void;
-      variant?: 'primary' | 'ghost';
+      variant?: "primary" | "ghost";
     }[]
   ) => {
     setAlertConfig({
@@ -106,20 +182,25 @@ export default function HomeScreen() {
   };
 
   const hideAlert = () => {
-    setAlertConfig(prev => ({ ...prev, visible: false }));
+    setAlertConfig((prev) => ({ ...prev, visible: false }));
   };
 
   const loadSavedLocation = useCallback(async () => {
     try {
       setIsLoading(true);
-      const saved = await AsyncStorage.getItem('parkedLocation');
-      const savedStartTime = await AsyncStorage.getItem('parkingStartTime');
-      
+      const saved = await AsyncStorage.getItem("parkedLocation");
+      const savedStartTime = await AsyncStorage.getItem("parkingStartTime");
+
+      console.log("Loading saved location:", saved);
+      console.log("Loading saved start time:", savedStartTime);
+
       if (saved) {
         const parsedLocation = JSON.parse(saved);
+        console.log("Parsed location:", parsedLocation);
+
         setLocation(parsedLocation);
         setIsParking(true);
-        
+
         // Load parking start time
         if (savedStartTime) {
           setParkingStartTime(parseInt(savedStartTime, 10));
@@ -127,16 +208,26 @@ export default function HomeScreen() {
           // If no start time saved, use current time (fallback for existing users)
           const fallbackTime = Date.now();
           setParkingStartTime(fallbackTime);
-          await AsyncStorage.setItem('parkingStartTime', fallbackTime.toString());
+          await AsyncStorage.setItem(
+            "parkingStartTime",
+            fallbackTime.toString()
+          );
         }
+
+        console.log("Successfully loaded parking session");
       } else {
+        console.log("No saved location found");
         setLocation(null);
         setIsParking(false);
         setParkingStartTime(null);
       }
     } catch (error) {
-      console.error('Error loading location:', error);
-      showAlert(t('common.error'), t('parking.loadError'), 'error');
+      console.error("Error loading location:", error);
+      showAlert(t("common.error"), t("parking.loadError"), "error");
+      // Reset state on error
+      setLocation(null);
+      setIsParking(false);
+      setParkingStartTime(null);
     } finally {
       setIsLoading(false);
     }
@@ -145,17 +236,17 @@ export default function HomeScreen() {
   useEffect(() => {
     (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
+      if (status !== "granted") {
         setHasPermission(false);
         showAlert(
-          t('permissions.locationDenied'),
-          t('permissions.locationDeniedMessage'),
-          'error',
+          t("permissions.locationDenied"),
+          t("permissions.locationDeniedMessage"),
+          "error",
           [
             {
-              title: t('common.ok'),
+              title: t("common.ok"),
               onPress: hideAlert,
-              variant: 'primary',
+              variant: "primary",
             },
           ]
         );
@@ -170,13 +261,13 @@ export default function HomeScreen() {
     if (!hasPermission) return;
 
     setIsLoading(true);
-    
+
     let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== 'granted') {
+    if (status !== "granted") {
       showAlert(
-        t('permissions.locationDenied'),
-        t('permissions.locationAccessError'),
-        'error'
+        t("permissions.locationDenied"),
+        t("permissions.locationAccessError"),
+        "error"
       );
       setIsLoading(false);
       return;
@@ -189,36 +280,47 @@ export default function HomeScreen() {
       const { latitude, longitude } = currentLocation.coords;
       const startTime = Date.now();
 
-      await AsyncStorage.setItem('parkedLocation', JSON.stringify({ latitude, longitude }));
-      await AsyncStorage.setItem('parkingStartTime', startTime.toString());
-      
-      setLocation({ latitude, longitude });
+      const locationData = { latitude, longitude };
+
+      // Save to AsyncStorage with error handling
+      await AsyncStorage.setItem(
+        "parkedLocation",
+        JSON.stringify(locationData)
+      );
+      await AsyncStorage.setItem("parkingStartTime", startTime.toString());
+
+      // Verify the data was saved correctly
+      const savedLocation = await AsyncStorage.getItem("parkedLocation");
+      const savedStartTime = await AsyncStorage.getItem("parkingStartTime");
+
+      if (!savedLocation || !savedStartTime) {
+        throw new Error("Failed to save parking data to storage");
+      }
+
+      console.log("Parking location saved successfully:", locationData);
+
+      setLocation(locationData);
       setParkingStartTime(startTime);
       setIsParking(true);
-      
-      showAlert(
-        t('common.success'),
-        t('parking.startSuccess'),
-        'success',
-        [
-          {
-            title: t('parking.navigateToCar'),
-            onPress: () => {
-              hideAlert();
-              navigateToLocation();
-            },
-            variant: 'primary',
+
+      showAlert(t("common.success"), t("parking.startSuccess"), "success", [
+        {
+          title: t("parking.navigateToCar"),
+          onPress: () => {
+            hideAlert();
+            navigateToLocation();
           },
-          {
-            title: t('common.ok'),
-            onPress: hideAlert,
-            variant: 'ghost',
-          },
-        ]
-      );
+          variant: "primary",
+        },
+        {
+          title: t("common.ok"),
+          onPress: hideAlert,
+          variant: "ghost",
+        },
+      ]);
     } catch (err) {
-      console.error('Error saving location:', err);
-      showAlert(t('common.error'), t('parking.saveError'), 'error');
+      console.error("Error saving location:", err);
+      showAlert(t("common.error"), t("parking.saveError"), "error");
     } finally {
       setIsLoading(false);
     }
@@ -226,57 +328,108 @@ export default function HomeScreen() {
 
   const endParking = async () => {
     showAlert(
-      t('parking.confirmEnd'),
-      t('parking.confirmEndMessage'),
-      'warning',
+      t("parking.confirmEnd"),
+      t("parking.confirmEndMessage"),
+      "warning",
       [
         {
-          title: t('parking.endParking'),
+          title: t("parking.endParking"),
           onPress: async () => {
             hideAlert();
             setIsLoading(true);
             try {
-              await AsyncStorage.removeItem('parkedLocation');
-              await AsyncStorage.removeItem('parkingStartTime');
+              await AsyncStorage.removeItem("parkedLocation");
+              await AsyncStorage.removeItem("parkingStartTime");
               setLocation(null);
               setParkingStartTime(null);
               setIsParking(false);
-              showAlert(t('common.success'), t('parking.endSuccess'), 'success');
+              showAlert(
+                t("common.success"),
+                t("parking.endSuccess"),
+                "success"
+              );
             } catch (error) {
-              console.error('Error clearing location:', error);
-              showAlert(t('common.error'), t('parking.clearError'), 'error');
+              console.error("Error clearing location:", error);
+              showAlert(t("common.error"), t("parking.clearError"), "error");
             } finally {
               setIsLoading(false);
             }
           },
-          variant: 'primary',
+          variant: "primary",
         },
         {
-          title: t('common.cancel'),
+          title: t("common.cancel"),
           onPress: hideAlert,
-          variant: 'ghost',
+          variant: "ghost",
         },
       ]
     );
   };
 
   const navigateToLocation = async () => {
-    if (!location) {
-      showAlert(t('parking.noLocation'), t('parking.noLocationMessage'), 'info');
+    let currentLocation = location;
+
+    if (!currentLocation) {
+      try {
+        const saved = await AsyncStorage.getItem("parkedLocation");
+        if (saved) {
+          currentLocation = JSON.parse(saved);
+        }
+      } catch (error) {
+        console.error("Error loading location from storage:", error);
+      }
+    }
+
+    if (!currentLocation) {
+      showAlert(
+        t("parking.noLocation"),
+        t("parking.noLocationMessage"),
+        "info"
+      );
       return;
     }
 
-    const url = `https://www.google.com/maps/dir/?api=1&destination=${location.latitude},${location.longitude}`;
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${currentLocation.latitude},${currentLocation.longitude}`;
+
     try {
-      const supported = await Linking.canOpenURL(url);
-      if (supported) {
-        await Linking.openURL(url);
-      } else {
-        showAlert(t('common.error'), t('parking.mapsError'), 'error');
+      // zamiast sprawdzać canOpenURL, od razu próbujemy otworzyć
+      await Linking.openURL(url);
+    } catch (err) {
+      console.error("Błąd otwierania Maps:", err);
+      // fallback - w razie czego spróbuj otworzyć geo:
+      const fallback = `geo:${currentLocation.latitude},${currentLocation.longitude}?q=${currentLocation.latitude},${currentLocation.longitude}`;
+      try {
+        await Linking.openURL(fallback);
+      } catch {
+        showAlert(t("common.error"), t("parking.mapsError"), "error");
       }
-    } catch {
-      showAlert(t('common.error'), t('parking.mapsError'), 'error');
     }
+  };
+
+  const openCompass = async () => {
+    // Check both state and AsyncStorage to ensure we have the location
+    let currentLocation = location;
+
+    if (!currentLocation) {
+      try {
+        const saved = await AsyncStorage.getItem("parkedLocation");
+        if (saved) {
+          currentLocation = JSON.parse(saved);
+        }
+      } catch (error) {
+        console.error("Error loading location from storage:", error);
+      }
+    }
+
+    if (!currentLocation) {
+      showAlert(
+        t("parking.noLocation"),
+        t("parking.noLocationMessage"),
+        "info"
+      );
+      return;
+    }
+    router.push("/compass");
   };
 
   // Animation styles
@@ -316,14 +469,13 @@ export default function HomeScreen() {
     ],
   }));
 
-
   if (hasPermission === null) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
           <StatusIndicator
             variant="loading"
-            title={t('permissions.requestingPermission')}
+            title={t("permissions.requestingPermission")}
             animated
           />
         </View>
@@ -337,8 +489,8 @@ export default function HomeScreen() {
         <View style={styles.errorContainer}>
           <StatusIndicator
             variant="error"
-            title={t('permissions.locationDenied')}
-            subtitle={t('permissions.locationDeniedMessage')}
+            title={t("permissions.locationDenied")}
+            subtitle={t("permissions.locationDeniedMessage")}
           />
         </View>
       </SafeAreaView>
@@ -349,13 +501,13 @@ export default function HomeScreen() {
     <SafeAreaView key={languageKey} style={styles.container}>
       {/* Background Lottie Animation */}
       <LottieView
-        source={require('../assets/animations/Globe.json')}
+        source={require("../assets/animations/Globe.json")}
         style={styles.lottieBackground}
         autoPlay
         loop
         speed={0.8}
       />
-      
+
       {/* Blur overlay */}
       <BlurView intensity={40} style={styles.blurOverlay}>
         <ScrollView
@@ -371,58 +523,58 @@ export default function HomeScreen() {
           {/* Header */}
           <Animated.View style={[styles.header, headerAnimatedStyle]}>
             <Text style={styles.title}>
-              🚗 {isParking ? t('parking.parkingHere') : t('parking.title')}
+              🚗 {isParking ? t("parking.parkingHere") : t("parking.title")}
             </Text>
             <Text style={styles.subtitle}>
-              {isParking 
-                ? t('parking.parkingActiveSubtitle')
-                : t('parking.welcomeSubtitle')
-              }
+              {isParking
+                ? t("parking.parkingActiveSubtitle")
+                : t("parking.welcomeSubtitle")}
             </Text>
+            {/* <Text>__DEV__: {__DEV__ ? 'true' : 'false'}</Text> */}
           </Animated.View>
-          
+          {/* <Text>adUnitId: {adUnitId}</Text>
+          <Text>bannerAdUnitId: {bannerAdUnitId}</Text> */}
           {/* Status indicator */}
           <Animated.View style={[styles.statusContainer, statusAnimatedStyle]}>
             {isLoading ? (
               <StatusIndicator
                 variant="loading"
-                title={t('common.loading')}
-                subtitle={t('common.pleaseWait')}
+                title={t("common.loading")}
+                subtitle={t("common.pleaseWait")}
                 animated
               />
             ) : isParking && location ? (
               <StatusIndicator
                 variant="active"
-                title={t('parking.parkingActive')}
-                subtitle={t('parking.parkingActiveDescription')}
+                title={t("parking.parkingActive")}
+                subtitle={t("parking.parkingActiveDescription")}
                 icon="car-outline"
                 animated
               />
             ) : (
               <StatusIndicator
                 variant="inactive"
-                title={t('parking.noParkingActive')}
-                subtitle={t('parking.readyToStart')}
+                title={t("parking.noParkingActive")}
+                subtitle={t("parking.readyToStart")}
                 icon="location-outline"
               />
             )}
           </Animated.View>
-          
+
           {/* Parking Timer */}
           {isParking && parkingStartTime && (
             <Animated.View style={[styles.timerContainer, statusAnimatedStyle]}>
-              <ParkingTimer
-                startTime={parkingStartTime}
-                isActive={isParking}
-              />
+              <ParkingTimer startTime={parkingStartTime} isActive={isParking} />
             </Animated.View>
           )}
-          
+
           {/* Action Buttons */}
-          <Animated.View style={[styles.buttonsContainer, buttonsAnimatedStyle]}>
+          <Animated.View
+            style={[styles.buttonsContainer, buttonsAnimatedStyle]}
+          >
             {!isParking ? (
               <Button
-                title={t('parking.startParking')}
+                title={t("parking.startParking")}
                 onPress={startParking}
                 variant="primary"
                 size="xl"
@@ -434,7 +586,7 @@ export default function HomeScreen() {
             ) : (
               <View style={styles.parkingButtons}>
                 <Button
-                  title={t('parking.navigateToCar')}
+                  title={t("parking.navigateToCar")}
                   onPress={navigateToLocation}
                   variant="success"
                   size="lg"
@@ -443,9 +595,20 @@ export default function HomeScreen() {
                   style={styles.navigationButton}
                   fullWidth
                 />
-                
+
+                {/* <Button
+                  title={t('compass.openCompass')}
+                  onPress={openCompass}
+                  variant="primary"
+                  size="lg"
+                  icon="compass-outline"
+                  disabled={isLoading}
+                  style={styles.compassButton}
+                  fullWidth
+                /> */}
+
                 <Button
-                  title={t('parking.endParking')}
+                  title={t("parking.endParking")}
                   onPress={endParking}
                   variant="error"
                   size="md"
@@ -457,18 +620,30 @@ export default function HomeScreen() {
               </View>
             )}
           </Animated.View>
-          
+
           {/* Additional Info */}
           <Animated.View style={[styles.infoContainer, contentAnimatedStyle]}>
             <Text style={styles.infoText}>
-              {isParking 
-                ? t('parking.parkingInfoActive')
-                : t('parking.parkingInfoInactive')
-              }
+              {isParking
+                ? t("parking.parkingInfoActive")
+                : t("parking.parkingInfoInactive")}
             </Text>
           </Animated.View>
         </ScrollView>
       </BlurView>
+
+      {/* Banner Ad - Above navigation bar */}
+      <View style={[styles.bannerContainer, { paddingBottom: insets.bottom + 8 }]}>
+        <BannerAd
+          ref={bannerRef}
+          unitId={bannerAdUnitId}
+          size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
+          onAdLoaded={() => console.log('✅ Banner Ad loaded')}
+          onAdFailedToLoad={(error) => console.error('❌ Banner Ad failed to load:', error)}
+          onAdOpened={() => console.log('🎯 Banner Ad opened')}
+          onAdClosed={() => console.log('📱 Banner Ad closed')}
+        />
+      </View>
 
       {/* Alert */}
       <Alert
@@ -481,7 +656,6 @@ export default function HomeScreen() {
       />
 
       {/* Language Selector */}
-
     </SafeAreaView>
   );
 }
@@ -492,7 +666,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background.primary,
   },
   lottieBackground: {
-    position: 'absolute',
+    position: "absolute",
     width: width * 1.5,
     height: height * 1.5,
     top: -(height * 0.25),
@@ -509,23 +683,23 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingHorizontal: SPACING.xl,
     paddingTop: SPACING.xl,
-    paddingBottom: SPACING.xxxl,
+    paddingBottom: SPACING.xxxl + 120, // Extra space for banner ad above navigation bar
   },
   languageSelectorContainer: {
-    alignSelf: 'flex-end',
+    alignSelf: "flex-end",
     marginBottom: SPACING.lg,
   },
   header: {
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: SPACING.xl,
   },
   title: {
-    fontSize: TYPOGRAPHY.fontSizes['4xl'],
+    fontSize: TYPOGRAPHY.fontSizes["4xl"],
     fontWeight: TYPOGRAPHY.fontWeights.extrabold as any,
     color: COLORS.text.primary,
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: SPACING.sm,
-    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+    textShadowColor: "rgba(0, 0, 0, 0.8)",
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 8,
   } as TextStyle,
@@ -533,7 +707,7 @@ const styles = StyleSheet.create({
     fontSize: TYPOGRAPHY.fontSizes.lg,
     fontWeight: TYPOGRAPHY.fontWeights.medium as any,
     color: COLORS.text.secondary,
-    textAlign: 'center',
+    textAlign: "center",
     lineHeight: TYPOGRAPHY.fontSizes.lg * TYPOGRAPHY.lineHeights.normal,
   } as TextStyle,
   statusContainer: {
@@ -551,30 +725,44 @@ const styles = StyleSheet.create({
   navigationButton: {
     marginBottom: SPACING.md,
   },
+  compassButton: {
+    marginBottom: SPACING.md,
+  },
   endButton: {
     opacity: 0.9,
   },
   infoContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     paddingHorizontal: SPACING.lg,
   },
   infoText: {
     fontSize: TYPOGRAPHY.fontSizes.sm,
     fontWeight: TYPOGRAPHY.fontWeights.medium as any,
     color: COLORS.text.tertiary,
-    textAlign: 'center',
+    textAlign: "center",
     lineHeight: TYPOGRAPHY.fontSizes.sm * TYPOGRAPHY.lineHeights.relaxed,
   } as TextStyle,
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     paddingHorizontal: SPACING.xl,
   },
   errorContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     paddingHorizontal: SPACING.xl,
+  },
+  bannerContainer: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.9)",
+
+    paddingHorizontal: SPACING.md,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

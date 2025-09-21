@@ -49,5 +49,28 @@
     "spanish": "Español",
     "german": "Deutsch",
     "french": "Français"
+  },
+  "compass": {
+    "title": "Nawigacja Kompasowa",
+    "openCompass": "Odpal Kompas",
+    "backToHome": "Powrót do głównej",
+    "distanceToCar": "Odległość do auta",
+    "directionToCar": "Kierunek do auta",
+    "meters": "m",
+    "kilometers": "km",
+    "north": "Północ",
+    "south": "Południe",
+    "east": "Wschód",
+    "west": "Zachód",
+    "northeast": "Północny wschód",
+    "northwest": "Północny zachód",
+    "southeast": "Południowy wschód",
+    "southwest": "Południowy zachód",
+    "calibrating": "Kalibracja kompasu...",
+    "calibrationComplete": "Kompas skalibrowany",
+    "accuracy": "Dokładność",
+    "poor": "Słaba",
+    "good": "Dobra",
+    "excellent": "Doskonała"
   }
 }
