@@ -58,6 +58,7 @@ const { width, height } = Dimensions.get("window");
 // const bannerAdUnitId = __DEV__ ? 'ca-app-pub-3940256099942544/9214589741' : ADMOB_BANNER_ID
 
 
+
 // testowe id V
 // const adUnitId = 'ca-app-pub-3940256099942544/9257395921'
 // const bannerAdUnitId = 'ca-app-pub-3940256099942544/9214589741'
@@ -435,31 +436,6 @@ export default function HomeScreen() {
     }
   };
 
-  const openCompass = async () => {
-    // Check both state and AsyncStorage to ensure we have the location
-    let currentLocation = location;
-
-    if (!currentLocation) {
-      try {
-        const saved = await AsyncStorage.getItem("parkedLocation");
-        if (saved) {
-          currentLocation = JSON.parse(saved);
-        }
-      } catch (error) {
-        console.error("Error loading location from storage:", error);
-      }
-    }
-
-    if (!currentLocation) {
-      showAlert(
-        t("parking.noLocation"),
-        t("parking.noLocationMessage"),
-        "info"
-      );
-      return;
-    }
-    router.push("/compass");
-  };
 
   // Animation styles
   const headerAnimatedStyle = useAnimatedStyle(() => ({
@@ -625,16 +601,16 @@ export default function HomeScreen() {
                   fullWidth
                 />
 
-                {/* <Button
+                <Button
                   title={t('compass.openCompass')}
-                  onPress={openCompass}
+                  onPress={() => router.push('/compass')}
                   variant="primary"
                   size="lg"
                   icon="compass-outline"
                   disabled={isLoading}
                   style={styles.compassButton}
                   fullWidth
-                /> */}
+                />
 
                 <Button
                   title={t("parking.endParking")}
