@@ -53,7 +53,7 @@ export default function CompassScreen({ navigation }: CompassScreenProps) {
         RNAlert.alert(
           t('common.error'),
           t('parking.noLocationMessage'),
-          [{ text: t('common.ok'), onPress: () => router.back() }]
+          [{ text: t('common.ok'), onPress: () => router.push('/') }]
         );
       }
     } catch (error) {
@@ -61,7 +61,7 @@ export default function CompassScreen({ navigation }: CompassScreenProps) {
       RNAlert.alert(
         t('common.error'),
         t('parking.loadError'),
-        [{ text: t('common.ok'), onPress: () => router.back() }]
+        [{ text: t('common.ok'), onPress: () => router.push('/') }]
       );
     }
   }, []);
@@ -109,7 +109,14 @@ export default function CompassScreen({ navigation }: CompassScreenProps) {
          setHeading(heading);
          setIsCalibrated(true); // Assume calibrated after getting magnetometer data
       });
-      return () => subscription.remove();
+      
+      // Store subscription for cleanup
+      return () => {
+        subscription?.remove();
+      };
+    }).catch((error) => {
+      console.error('Error setting up magnetometer:', error);
+      RNAlert.alert('Error', 'Failed to setup magnetometer');
     });
   }, []);
 
@@ -264,7 +271,7 @@ export default function CompassScreen({ navigation }: CompassScreenProps) {
             <Text style={styles.errorText}>{t('parking.noLocation')}</Text>
             <Button
               title={t('compass.backToHome')}
-              onPress={() => router.back()}
+              onPress={() => router.push('/')}
               variant="primary"
               size="lg"
             />
@@ -288,7 +295,7 @@ export default function CompassScreen({ navigation }: CompassScreenProps) {
               <View style={styles.backButtonContainer}>
                 <Button
                   title={t('compass.backToHome')}
-                  onPress={() => router.back()}
+                  onPress={() => router.push('/')}
                   variant="ghost"
                   size="sm"
                   icon="arrow-back-outline"

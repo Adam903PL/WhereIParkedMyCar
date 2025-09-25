@@ -1,4 +1,4 @@
-// app/index.tsx (Enhanced HomeScreen)
+// app/index.tsx (Enhanced HomeScreen) - v3.0.2 - Fixed permissions
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { BlurView } from "expo-blur";
@@ -28,30 +28,47 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { onLanguageChange, t } from "../i18n";
 import { COLORS, SPACING, TYPOGRAPHY } from "../theme/designTokens";
 
-import MobileAds, {
+import Constants from "expo-constants";
+import {
   AdEventType,
   AppOpenAd,
   BannerAd,
   BannerAdSize,
-  useForeground
+  MaxAdContentRating,
+  default as MobileAds,
+  default as mobileAds,
+  useForeground,
 } from "react-native-google-mobile-ads";
-
-import { ENV } from "../config/env";
 import LanguageSelector from "./components/LanguageSelector";
 import Alert from "./components/ui/Alert";
 import Button from "./components/ui/Button";
 import ParkingTimer from "./components/ui/ParkingTimer";
 import StatusIndicator from "./components/ui/StatusIndicator";
+const {
+  ADMOB_APP_OPEN_ID,
+  ADMOB_BANNER_ID,
+  ADMOB_TEST_APP_OPEN_ID,
+  ADMOB_TEST_BANNER_ID,
+} = (Constants.expoConfig as any)?.extra || {};
 
 const { width, height } = Dimensions.get("window");
 
-
 // pierwsze id testowe
-const adUnitId = __DEV__ ? 'ca-app-pub-3940256099942544/9257395921' : ENV.ADMOB_APP_OPEN_ID
-const bannerAdUnitId = __DEV__ ? 'ca-app-pub-3940256099942544/9214589741' : ENV.ADMOB_BANNER_ID
+// const adUnitId = __DEV__ ? 'ca-app-pub-3940256099942544/9257395921' : ADMOB_APP_OPEN_ID
+// const bannerAdUnitId = __DEV__ ? 'ca-app-pub-3940256099942544/9214589741' : ADMOB_BANNER_ID
 
-// const adUnitId = 'ca-app-pub-4881517997860906/1415723980'
-// const bannerAdUnitId = 'ca-app-pub-4881517997860906/5192167523'
+
+// testowe id V
+// const adUnitId = 'ca-app-pub-3940256099942544/9257395921'
+// const bannerAdUnitId = 'ca-app-pub-3940256099942544/9214589741'
+
+// produkcyjna wersja od chatGPT chuj wie czy działa
+const adUnitId = __DEV__
+  ? ADMOB_TEST_APP_OPEN_ID || "ca-app-pub-3940256099942544/9257395921"
+  : ADMOB_APP_OPEN_ID;
+const bannerAdUnitId = __DEV__
+  ? ADMOB_TEST_BANNER_ID || "ca-app-pub-3940256099942544/9214589741"
+  : ADMOB_BANNER_ID;
 
 export default function HomeScreen() {
   // const adUnitId = __DEV__ ? TestIds.APP_OPEN : 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyyyyyy';
@@ -60,12 +77,34 @@ export default function HomeScreen() {
   useForeground(() => {
     Platform.OS === "ios" && bannerRef.current?.load();
   });
-  MobileAds().initialize().then((adapterStatuses: any) => {
-    console.log('AdMob initialized', adapterStatuses);
+  MobileAds()
+    .initialize()
+    .then((adapterStatuses: any) => {
+      console.log("AdMob initialized v3.0.2", adapterStatuses);
+    });
+
+  // Configure test device for AdMob
+  mobileAds()
+  .setRequestConfiguration({
+    // opcjonalnie ograniczenia wieku/personalizacji
+    maxAdContentRating: MaxAdContentRating.PG,
+    tagForChildDirectedTreatment: false,
+    tagForUnderAgeOfConsent: false,
+    testDeviceIdentifiers: ['71975792C536A9B8A626A9D196A6F549'], // twoje urządzenie
+  })
+  .then(() => {
+    console.log('✅ AdMob test device configuration applied');
   });
+  
+  MobileAds().initialize().then((adapterStatuses: any) => {
+    console.log('AdMob initialized v3.0.2', adapterStatuses);
+  });
+  
   useEffect(() => {
-    console.log('🚀 Initializing App Open Ad with ID:', adUnitId);
-    
+    console.log("🚀 Initializing App Open Ad with ID:", adUnitId);
+    console.log("🔍 Development mode:", __DEV__);
+    console.log("📱 Banner Ad Unit ID:", bannerAdUnitId);
+
     const appOpenAd = AppOpenAd.createForAdRequest(adUnitId, {
       keywords: ["parking", "car"],
     });
@@ -73,7 +112,7 @@ export default function HomeScreen() {
     const unsubscribeLoaded = appOpenAd.addAdEventListener(
       AdEventType.LOADED,
       () => {
-        console.log('✅ App Open Ad loaded successfully');
+        console.log("✅ App Open Ad loaded successfully");
         appOpenAd.show();
       }
     );
@@ -81,25 +120,25 @@ export default function HomeScreen() {
     const unsubscribeError = appOpenAd.addAdEventListener(
       AdEventType.ERROR,
       (err) => {
-        console.error('❌ App Open Ad error:', err);
+        console.error("❌ App Open Ad error:", err);
       }
     );
 
     const unsubscribeOpened = appOpenAd.addAdEventListener(
       AdEventType.OPENED,
       () => {
-        console.log('🎯 App Open Ad opened');
+        console.log("🎯 App Open Ad opened");
       }
     );
 
     const unsubscribeClosed = appOpenAd.addAdEventListener(
       AdEventType.CLOSED,
       () => {
-        console.log('📱 App Open Ad closed');
+        console.log("📱 App Open Ad closed");
       }
     );
 
-    console.log('🔄 Loading App Open Ad...');
+    console.log("🔄 Loading App Open Ad...");
     appOpenAd.load();
 
     return () => {
@@ -259,65 +298,54 @@ export default function HomeScreen() {
 
   const startParking = async () => {
     if (!hasPermission) return;
-
+  
     setIsLoading(true);
-
-    let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== "granted") {
-      showAlert(
-        t("permissions.locationDenied"),
-        t("permissions.locationAccessError"),
-        "error"
-      );
-      setIsLoading(false);
-      return;
-    }
-
+  
     try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        showAlert(t("permissions.locationDenied"), t("permissions.locationAccessError"), "error");
+        setIsLoading(false);
+        return;
+      }
+  
       const currentLocation = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.High,
       });
-      const { latitude, longitude } = currentLocation.coords;
+  
+      const { latitude, longitude, altitude } = currentLocation.coords;
       const startTime = Date.now();
-
-      const locationData = { latitude, longitude };
-
-      // Save to AsyncStorage with error handling
-      await AsyncStorage.setItem(
-        "parkedLocation",
-        JSON.stringify(locationData)
-      );
+  
+      const locationData = { latitude, longitude, altitude };
+  
+      await AsyncStorage.setItem("parkedLocation", JSON.stringify(locationData));
       await AsyncStorage.setItem("parkingStartTime", startTime.toString());
-
-      // Verify the data was saved correctly
-      const savedLocation = await AsyncStorage.getItem("parkedLocation");
-      const savedStartTime = await AsyncStorage.getItem("parkingStartTime");
-
-      if (!savedLocation || !savedStartTime) {
-        throw new Error("Failed to save parking data to storage");
-      }
-
-      console.log("Parking location saved successfully:", locationData);
-
+  
       setLocation(locationData);
       setParkingStartTime(startTime);
       setIsParking(true);
-
-      showAlert(t("common.success"), t("parking.startSuccess"), "success", [
-        {
-          title: t("parking.navigateToCar"),
-          onPress: () => {
-            hideAlert();
-            navigateToLocation();
+  
+      // Alert z wysokością
+      showAlert(
+        t("common.success"),
+        `Parking zapisany!\nTwoja wysokość: ${altitude?.toFixed(2) ?? "brak danych"} m ${latitude?.toFixed(2) ?? "brak danych"} ${longitude?.toFixed(2) ?? "brak danych"}`,
+        "success",
+        [
+          {
+            title: t("parking.navigateToCar"),
+            onPress: () => {
+              hideAlert();
+              navigateToLocation();
+            },
+            variant: "primary",
           },
-          variant: "primary",
-        },
-        {
-          title: t("common.ok"),
-          onPress: hideAlert,
-          variant: "ghost",
-        },
-      ]);
+          {
+            title: t("common.ok"),
+            onPress: hideAlert,
+            variant: "ghost",
+          },
+        ]
+      );
     } catch (err) {
       console.error("Error saving location:", err);
       showAlert(t("common.error"), t("parking.saveError"), "error");
@@ -325,6 +353,7 @@ export default function HomeScreen() {
       setIsLoading(false);
     }
   };
+  
 
   const endParking = async () => {
     showAlert(
@@ -633,15 +662,16 @@ export default function HomeScreen() {
       </BlurView>
 
       {/* Banner Ad - Above navigation bar */}
-      <View style={[styles.bannerContainer, { paddingBottom: insets.bottom + 8 }]}>
+      <View
+        style={[styles.bannerContainer, { paddingBottom: insets.bottom + 8 }]}
+      >
         <BannerAd
-          ref={bannerRef}
           unitId={bannerAdUnitId}
-          size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
-          onAdLoaded={() => console.log('✅ Banner Ad loaded')}
-          onAdFailedToLoad={(error) => console.error('❌ Banner Ad failed to load:', error)}
-          onAdOpened={() => console.log('🎯 Banner Ad opened')}
-          onAdClosed={() => console.log('📱 Banner Ad closed')}
+          size={BannerAdSize.BANNER}
+          requestOptions={{ requestNonPersonalizedAdsOnly: true }}
+          onAdLoaded={() => console.log("Banner loaded")}
+          onAdFailedToLoad={(err) => console.error("Banner failed", err)}
+          ref={bannerRef}
         />
       </View>
 
